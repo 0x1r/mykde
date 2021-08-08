@@ -17,6 +17,13 @@ if [[ $answer = y ]] ; then
   mkfs.vfat -F 32 $efipartition
 fi
 
+if [[ $answer = n ]] ; then
+  echo "Enter EFI partition: "
+  read efipartition
+  mkdir -p /mnt/boot/efi
+  mount $efipartition /mnt/boot/efi 
+fi
+
 mount $partition /mnt 
 pacstrap /mnt base base-devel linux linux-firmware intel-ucode git vim
 genfstab -U /mnt >> /mnt/etc/fstab
@@ -42,7 +49,7 @@ echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
 mkinitcpio -P
 #i915 nvidia(mkinitcpio -p linux)
 pacman -S --noconfirm nvidia nvidia-utils nvidia-settings
-sed -i -e 's/MODULES=(.*)/MODULES(i915 nvidia)/' /etc/mkinitcpio.conf
+sed -i -e 's/MODULES=(.*)/MODULES=(i915 nvidia)/' /etc/mkinitcpio.conf
 mkinitcpio -p linux
 passwd
 # echo root:password | chpasswd
@@ -86,5 +93,6 @@ mkswap /swapfile
 swapon /swapfile
 # vim /etc/fstab
 #(swapfile as comment)
-echo "/swapfile  none   swap   defaults   0 0" >> /etc/fstab
-echo "Pre-Installation Finish Reboot now"
+#echo "/swapfile  none   swap   defaults   0 0" >> /etc/fstab
+echo "Pre-Installation Finish Reboot now after genfstabbing last command"
+#genfstab -U /mnt >> /mnt/etc/fstab
